@@ -1,4 +1,4 @@
-import replayparser
+import replayparser # Seems silly, but needed to trigger import in __init__.py which registers handlers.
 from replayparser.core import parse_replay
 
 r = parse_replay("assets/replay1.gzr")
