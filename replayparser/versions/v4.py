@@ -2,7 +2,9 @@ from dataclasses import dataclass, field
 from typing import List, Tuple
 from ..core import register_header, register_player, BinaryReader, register_stage
 
-# these must match your script
+# I'm not sure *where* these bytes are written in the client's source,
+# but they indicate the end of each character information struct in *some* (most) 
+# v4 replays.
 CHARINFO_MARKER  = b'\x7A\x44\x00\x00\x7A\x44'
 CHARINFO_PAD     = 90
 MMCIP_END        = 12
