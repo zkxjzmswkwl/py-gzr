@@ -36,25 +36,19 @@ class StageV4:
     def from_reader(cls, r: BinaryReader):
         start = r.buf.tell()
 
-        # skip uidStage (u32) + stageID (u32)
         r.read('<II')
 
-        # read the 32-byte, NULL-terminated map name
         raw_name = r.read_bytes(MAPNAME_LENGTH)
         map_name = raw_name.split(b'\x00', 1)[0].decode('latin1', errors='ignore')
 
-        # one signed byte for map index
         map_idx, = r.read('<b')
 
-        # align up to 4 bytes
         pad = (4 - ((r.buf.tell() - start) % 4)) % 4
         if pad:
             r.skip(pad)
 
-        # skip the next 5×int32 (20 bytes) + 3×bool (3 bytes)
         r.skip(5*4 + 3*1)
 
-        # final pad out to exactly 68 bytes
         tail = 68 - (r.buf.tell() - start)
         if tail > 0:
             r.skip(tail)
@@ -93,7 +87,6 @@ class PlayerV4:
 
     @classmethod
     def from_reader(cls, r: BinaryReader, full: bytes):
-        # *** your working code, verbatim ***
         is_hero, = r.read('<?')
         start    = r.buf.tell()
 
@@ -106,11 +99,9 @@ class PlayerV4:
         raw_info = r.read_bytes(length)
         info     = BinaryReader(raw_info)
 
-        # 1) name & clan
         name     = info.read_string(32)
         clan     = info.read_string(CLAN_NAME_LENGTH)
 
-        # 2) the rest of MTD_CharInfo, field by field
         clan_grade, = info.read_int32(),
         clan_cont,  = info.read_uint16(),
         char_num,   = info.read_int8(),
@@ -126,18 +117,14 @@ class PlayerV4:
             info.read_uint16() for _ in range(9)
         )
 
-        # 3) equip slots
         equipped = [info.read_uint32() for _ in range(MMCIP_END)]
 
-        # 4) account grade + clan CLID
         user_grade = info.read_uint32()
         clan_clid  = info.read_uint32()
 
-        # 5) padding, then final UID
         info.skip(4)
         uid_val = info.read_uint32()
 
-        # skip your trailing bytes exactly as before
         r.skip(CHARINFO_PAD + 83)
 
         return cls(

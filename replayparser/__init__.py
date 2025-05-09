@@ -1,1 +1,1 @@
-from .versions import v4
+from .versions import v4, v6
