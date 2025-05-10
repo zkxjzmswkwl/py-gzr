@@ -176,10 +176,11 @@ class PlayerV6:
     discord_avatar_url: str
     discord_avatar_checksum: int
     uid:            int
+    muid:           int
     equipped:       List[int] = field(default_factory=list)
 
     @classmethod
-    def from_reader(cls, r: BinaryReader, full: bytes):
+    def from_reader(cls, r: BinaryReader, full: bytes, is_last: bool):
         is_hero, = r.read('<?')
         raw_name = r.read_bytes(32)
         name = raw_name.split(b'\x00', 1)[0].decode('latin1', errors='ignore')
@@ -223,7 +224,12 @@ class PlayerV6:
         discord_avatar_url = raw_discord_avatar_url.split(b'\x00', 1)[0].decode('latin1', errors='ignore')
         discord_avatar_checksum = r.read_uint32()
         uid_val = r.read_uint32()
-        r.skip(297)
+        muid = r.read_uint32()
+        if is_last:
+            print("GAYYY")
+            r.skip(260)
+        else:
+            r.skip(293)
 
         return cls(
             is_hero=is_hero,
@@ -261,6 +267,7 @@ class PlayerV6:
             discord_avatar_url=discord_avatar_url,
             discord_avatar_checksum=discord_avatar_checksum,
             uid=uid_val,
+            muid=muid,
             equipped=equipped
         )
 

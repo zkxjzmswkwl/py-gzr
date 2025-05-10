@@ -1,7 +1,10 @@
 import zlib, struct
 from io import BytesIO
 from typing import Type, Dict
-from .models import Replay, Command
+
+from replayparser.util.dump import hex_dump
+from .models import Replay, Command, Message
+from collections import Counter
 
 _HEADER_REGISTRY: Dict[int, Type] = {}
 _STAGE_REGISTRY:  Dict[int, Type] = {}
@@ -15,6 +18,7 @@ def register_stage(version: int, cls: Type):
 
 def register_player(version: int, cls: Type):
     _PLAYER_REGISTRY[version] = cls
+
 
 class BinaryReader:
     def __init__(self, data: bytes):
@@ -85,22 +89,39 @@ def parse_replay(path: str) -> Replay:
 
     print("Player count: ", cnt)
     players = []
-    for _ in range(cnt):
-        players.append(PlayerCls.from_reader(reader, full))
+    for idx, p in enumerate(range(cnt)): 
+        players.append(PlayerCls.from_reader(reader, full, idx == cnt))
 
-    # Fucked for now.
-    # game_time = reader.read_float()
+
+    reader.skip(0x4)
 
     commands = []
+    packets = []
     while True:
         try:
             t = reader.read_float()
+            reader.skip(4) # msvc padding because ?????
+            # no other compiler adds padding here.
+            # (yes, I checked.)
             sender = reader.read_uint32()
             sz     = reader.read_int32()
             data   = reader.read_bytes(sz)
             commands.append(Command(time=t, sender=sender, size=sz, data=data))
+            tmp_reader = BinaryReader(data)
+            sz_again = tmp_reader.read_int16()
+            opcode = tmp_reader.read_uint16()
+            packets.append({'opcode': opcode, 'buffer': data, 'sender': sender})
         except EOFError:
             break
 
+    messages = []
+    for pck in packets:
+        if pck['opcode'] == 1520:
+            r = BinaryReader(pck['buffer'])
+            r.skip(0x15)
+            sz = r.read_uint16()
+            msg = r.read_string(sz)
+            messages.append(Message(sender=pck['sender'], message=msg))
 
-    return Replay(header=header, stage=stage, players=players, commands=commands)
+
+    return Replay(header=header, stage=stage, players=players, commands=commands, messages=messages)

@@ -6,5 +6,7 @@ from replayparser.util import decompress_to_disk
 r = parse_replay("assets/igz_ladder.gzr")
 print(r.header, r.stage)
 for p in r.players:
-    print(p.name, p.clan)
+    print(p.name, p.clan, p.ranked_wins, p.muid, f"({hex(p.muid)})")
 print("Commands:", len(r.commands))
+for msg in r.messages:
+    print(msg.sender, msg.message)

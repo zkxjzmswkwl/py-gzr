@@ -19,3 +19,11 @@ def decompress_to_disk(gzr_input: str, decompressed_output: str):
     
     with open(decompressed_output, 'wb') as f:
         f.write(data)
+
+
+def hex_dump(data: bytes, width: int = 16):
+    for i in range(0, len(data), width):
+        chunk = data[i:i+width]
+        hex_bytes = ' '.join(f'{b:02X}' for b in chunk)
+        ascii_chars = ''.join(chr(b) if 32 <= b < 127 else '.' for b in chunk)
+        print(f'{i:08X}  {hex_bytes:<{width*3}}  {ascii_chars}')
