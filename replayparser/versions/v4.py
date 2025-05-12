@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List, Tuple
-from ..core import register_header, register_player, BinaryReader, register_stage
+from ..core import register_header, register_player, register_stage
+from ..binaryreader import BinaryReader
 
 # I'm not sure *where* these bytes are written in the client's source,
 # but they indicate the end of each character information struct in *some* (most) 

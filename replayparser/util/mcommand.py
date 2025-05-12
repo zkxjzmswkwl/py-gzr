@@ -2,7 +2,7 @@ import struct
 from enum import Enum
 from typing import List, Any
 
-from replayparser.core import BinaryReader
+from replayparser.binaryreader import BinaryReader
 
 class MPT(Enum):
     INT    = 0

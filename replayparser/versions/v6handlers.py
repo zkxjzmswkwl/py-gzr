@@ -1,12 +1,10 @@
 from collections import Counter, defaultdict
 
-from replayparser.core import BinaryReader
+from replayparser.binaryreader import BinaryReader
 from replayparser.models import Announcement, AntileadShotgun, ChangeWeapon, Dash, Death, GameDead, HPAPInfo, Massive, PeerSPMotion, PeerShotSP, Reload, Round, Skill, Slash, Spawn, Message, WorldItemPickup
 from replayparser.util.mget import get_shotgun_damage_info
 from replayparser.util.basicinfo import unpack_basicinfo
 from replayparser.util.mcommand import MPT, MCommand
-from replayparser.versions.v6 import PlayerV6
-damage_stats = defaultdict(lambda: {"total_damage": 0, "hit_count": 0, "damage_values": Counter()})
 
 def handle_basicinfo(c):
     """Opcode: 8016"""
@@ -184,3 +182,4 @@ def handle_game_dead(c):
     victim = r.read_uint32()
     victim_arg = r.read_uint32()
     return GameDead(attacker, attacker_arg, attacker_weapon_type, victim, victim_arg)
+

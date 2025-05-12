@@ -7,7 +7,6 @@ def mget_blob_array_count(blob: bytes) -> int:
     """
     Read the blob-array count (second int32) from the front of `blob`.
     """
-    # offset 4 bytes from start
     (count,) = struct.unpack_from('<i', blob, 4)
     return count
 
@@ -46,14 +45,13 @@ def mget_blob_array_element_offset(blob: bytes, index: int) -> int:
     element_size, count = struct.unpack_from('<ii', blob, 0)
     if not (0 <= index < count):
         raise IndexError(f"Index {index} out of range [0, {count})")
-    return 8 + element_size * index  # skip two ints (8 bytes)
+    return 8 + element_size * index 
 
 def get_shotgun_damage_info(blob: bytes, index: int) -> ShotgunDamageInfo:
     """
     Reads the `index`-th ShotgunDamageInfo from `blob` and returns it.
     """
     try:
-        # unpack in one go: I (uint32), i (int32), f (float32), i (int32), i (int32)
         target, dam, piercing, dam_type, = struct.unpack_from(
             '<Iifi', blob, 14
         )
@@ -81,7 +79,6 @@ def get_peer_node_info(blob: bytes, index: int):
     """
     base = mget_blob_array_element_offset(blob, index)
 
-    # unpack in one go: I (uint32), I (unt32), I (uint32)
     uid, dwIp, nPort, = struct.unpack_from(
         '<III', blob, 22
     )
