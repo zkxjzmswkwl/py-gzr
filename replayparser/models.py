@@ -153,6 +153,7 @@ class Reload:
 
 @dataclass
 class PeerShotSP:
+    """Meds and things like that. 'Special'"""
     time:     float
     pos_x:    float
     pos_y:    float
@@ -218,6 +219,7 @@ class GameDead:
 
 @dataclass
 class PeerShot:
+    """Weapon shots."""
     time: float
     pos_x: float
     pos_y: float

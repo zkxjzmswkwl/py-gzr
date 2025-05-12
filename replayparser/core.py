@@ -148,10 +148,8 @@ def parse_replay(path: str) -> Replay:
             game_dead = handle_game_dead(c)
             unpacked.append((time, c['sender'], opcode, game_dead))
         elif opcode == 10034:
-            hex_dump(c['buffer'])
             peer_shot = handle_peer_shot(c)
             unpacked.append((time, c['sender'], opcode, peer_shot))
-            print(peer_shot)
 
 
     r.packets = unpacked
