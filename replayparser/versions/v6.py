@@ -2,16 +2,10 @@ from dataclasses import dataclass, field
 from typing import List, Tuple
 from ..core import register_header, register_player, BinaryReader, register_stage
 
-# I'm not sure *where* these bytes are written in the client's source,
-# but they indicate the end of each character information struct in *some* (most) 
-# v4 replays.
-CHARINFO_MARKER  = b'\x7A\x44\x00\x00\x7A\x44'
-CHARINFO_PAD     = 90
 MMCIP_END        = 14
 CLAN_NAME_LENGTH = 16
 MAPNAME_LENGTH   = 32
 STAGE_NAME_LENGTH   = 64
-
 
 SIZE_REPLAY_HEADER_RG = 32
 SIZE_REPLAY_STAGE_SETTING_NODE = 192
@@ -35,6 +29,23 @@ def get_mmatch_gametype_name(value):
         100: "MMATCH_GAMETYPE_ALL"
     }
     return gametype_map.get(value, f"UNKNOWN_GAMETYPE_{value}")
+
+
+def opcode_to_packet(opcode: int) -> str:
+    """
+    Convert an opcode to a packet name.
+    """
+    packet_map = {
+        1520: "CHAT",
+        8016: "BASICINFO",
+        10001: "PING",
+        10002: "PONG",
+        60000: "DMG_COUNTER",
+        60001: "NOTIFY_HIT",
+        50054: "REQ_HPAP",
+        50055: "RESP_HPAP"
+    }
+    return packet_map.get(opcode, f"UNKNOWN_OPCODE_{opcode}")
 
 
 @dataclass
@@ -180,15 +191,12 @@ class PlayerV6:
     equipped:       List[int] = field(default_factory=list)
 
     @classmethod
-    def from_reader(cls, r: BinaryReader, full: bytes, is_last: bool):
-        is_hero, = r.read('<?')
+    def parse_player(cls, r: BinaryReader):
         raw_name = r.read_bytes(32)
         name = raw_name.split(b'\x00', 1)[0].decode('latin1', errors='ignore')
 
         raw_clan_name = r.read_bytes(CLAN_NAME_LENGTH)
         clan = raw_clan_name.split(b'\x00', 1)[0].decode('latin1', errors='ignore')
-        print("Name: ", name)
-        print("Clan: ", clan)
         clan_grade = r.read_int32()
         clan_cont = r.read_uint16()
         char_num = r.read_int8()
@@ -223,16 +231,8 @@ class PlayerV6:
         raw_discord_avatar_url = r.read_bytes(256)
         discord_avatar_url = raw_discord_avatar_url.split(b'\x00', 1)[0].decode('latin1', errors='ignore')
         discord_avatar_checksum = r.read_uint32()
-        uid_val = r.read_uint32()
-        muid = r.read_uint32()
-        if is_last:
-            print("GAYYY")
-            r.skip(260)
-        else:
-            r.skip(293)
-
         return cls(
-            is_hero=is_hero,
+            is_hero=False,
             name=name,
             clan=clan,
             clan_grade=clan_grade,
@@ -266,9 +266,56 @@ class PlayerV6:
             discord_id=discord_id,
             discord_avatar_url=discord_avatar_url,
             discord_avatar_checksum=discord_avatar_checksum,
+            muid=0,
+            uid=0
+        )
+
+    @classmethod
+    def from_reader(cls, r: BinaryReader, full: bytes):
+        is_hero, = r.read('<?')
+        player = cls.parse_player(r)
+        uid_val = r.read_uint32()
+        muid = r.read_uint32()
+        r.skip(293)
+
+        return cls(
+            is_hero=is_hero,
+            name=player.name,
+            clan=player.clan,
+            clan_grade=player.clan_grade,
+            clan_cont=player.clan_cont,
+            char_num=player.char_num,
+            level=player.level,
+            sex=player.sex,
+            hair=player.hair,
+            face=player.face,
+            xp=player.xp,
+            bp=player.bp,
+            gems=player.gems,
+            bonus_rate=player.bonus_rate,
+            prize=player.prize,
+            hp=player.hp,
+            ap=player.ap,
+            max_weight=player.max_weight,
+            safe_falls=player.safe_falls,
+            fr=player.fr,
+            cr=player.cr,
+            er=player.er,
+            wr=player.wr,
+            round_damage=player.round_damage,
+            ranked_wins=player.ranked_wins,
+            ranked_loses=player.ranked_loses,
+            ranked_points=player.ranked_points,
+            ranked_rank=player.ranked_rank,
+            user_grade=player.user_grade,
+            premium_grade=player.premium_grade,
+            clan_clid=player.clan_clid,
+            discord_id=player.discord_id,
+            discord_avatar_url=player.discord_avatar_url,
+            discord_avatar_checksum=player.discord_avatar_checksum,
             uid=uid_val,
             muid=muid,
-            equipped=equipped
+            equipped=player.equipped
         )
 
 register_header(6, HeaderV6)

@@ -2,9 +2,7 @@ import zlib, struct
 from io import BytesIO
 from typing import Type, Dict
 
-from replayparser.util.dump import hex_dump
-from .models import Replay, Command, Message
-from collections import Counter
+from .models import Replay, Command
 
 _HEADER_REGISTRY: Dict[int, Type] = {}
 _STAGE_REGISTRY:  Dict[int, Type] = {}
@@ -56,6 +54,7 @@ class BinaryReader:
             data += byte
         return data.decode('latin1', errors='ignore')
     def skip(self, n: int): self.buf.seek(n,1)
+    def back(self, n: int): self.buf.seek(-n,1)
 
 def parse_replay(path: str) -> Replay:
     raw = open(path,'rb').read()
@@ -89,12 +88,10 @@ def parse_replay(path: str) -> Replay:
 
     print("Player count: ", cnt)
     players = []
-    for idx, p in enumerate(range(cnt)): 
-        players.append(PlayerCls.from_reader(reader, full, idx == cnt))
-
+    for _ in range(cnt): 
+        players.append(PlayerCls.from_reader(reader, full))
 
     reader.skip(0x4)
-
     commands = []
     packets = []
     while True:
@@ -108,20 +105,17 @@ def parse_replay(path: str) -> Replay:
             data   = reader.read_bytes(sz)
             commands.append(Command(time=t, sender=sender, size=sz, data=data))
             tmp_reader = BinaryReader(data)
-            sz_again = tmp_reader.read_int16()
+            _ = tmp_reader.read_int16()
             opcode = tmp_reader.read_uint16()
+            # hack. for some reason chat packets aren't properly
+            # attributed to sender.
+            # Note: Not sure if still needed. Check.
+            if opcode == 1520:
+                tmp_reader.skip(5)
+                sender = tmp_reader.read_uint16()
+
             packets.append({'opcode': opcode, 'buffer': data, 'sender': sender})
         except EOFError:
             break
 
-    messages = []
-    for pck in packets:
-        if pck['opcode'] == 1520:
-            r = BinaryReader(pck['buffer'])
-            r.skip(0x15)
-            sz = r.read_uint16()
-            msg = r.read_string(sz)
-            messages.append(Message(sender=pck['sender'], message=msg))
-
-
-    return Replay(header=header, stage=stage, players=players, commands=commands, messages=messages)
+    return Replay(header=header, stage=stage, players=players, commands=commands, packets=packets)
