@@ -70,19 +70,19 @@ class MMatchRoundState(IntEnum):
 	MMATCH_ROUNDSTATE_END = 7
 
 @dataclass
-class Message:
-    sender: int
-    stage_uid: int
-    message: str
-    team: int
-
-@dataclass
 class Replay:
     header: Any
     stage:  Any
     players: List[Any]
     commands: List[Any]
     packets: List[Any]
+
+    def muid_to_name(self, muid):
+        for player in self.players:
+            if player.muid == muid:
+                return player.name
+        return f"Unknown_Player({muid})"
+
 
 @dataclass
 class Command:
@@ -92,6 +92,12 @@ class Command:
     data:   bytes
 
 @dataclass
+class Message:
+    sender: int
+    stage_uid: int
+    message: str
+    team: int
+@dataclass
 class Round:
     round: int
     state: MMatchRoundState
@@ -99,6 +105,12 @@ class Round:
 
 @dataclass
 class AntileadShotgun:
+    """
+    Don't trust that all fields will be populated.
+    Must first check if hit is True.
+
+    If it's not, none of the other fields matter and thus have no data.
+    """
     target: int
     damage: int
     piercing_ratio: float

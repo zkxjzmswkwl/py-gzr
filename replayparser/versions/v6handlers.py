@@ -5,6 +5,7 @@ from replayparser.models import Announcement, AntileadShotgun, ChangeWeapon, Das
 from replayparser.util.mget import get_shotgun_damage_info
 from replayparser.util.basicinfo import unpack_basicinfo
 from replayparser.util.mcommand import MPT, MCommand
+from replayparser.versions.playerv6 import PlayerV6
 
 def handle_basicinfo(c):
     """Opcode: 8016"""

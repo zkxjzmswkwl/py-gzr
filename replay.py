@@ -34,7 +34,7 @@ damage_by_round = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}}
 def entry():
     replay = gzr.parse_replay(f"assets/igz_ladder.gzr")
     current_round = 1
-    for sender, packet in replay.packets:
+    for time, sender, opcode, packet in replay.packets:
         pt = type(packet)
         if pt == BasicInfo:
             pass

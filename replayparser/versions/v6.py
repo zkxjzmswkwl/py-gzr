@@ -5,6 +5,9 @@ from replayparser.versions.playerv6 import PlayerV6
 from ..core import register_header, register_player, register_stage
 from ..binaryreader import BinaryReader
 
+from rich.console import Console
+from rich.table import Table
+
 MMCIP_END        = 14
 CLAN_NAME_LENGTH = 16
 MAPNAME_LENGTH   = 32
@@ -60,6 +63,18 @@ class HeaderV6:
     patch:    int = 0
     revision: int = 0
 
+    def display_table(cls):
+        table = Table(title="Header Information")
+        table.add_column("Field", style="green", justify="left")
+        table.add_column("Value", style="cyan", justify="left")
+
+        for field, value in cls.__dict__.items():
+            if not field.startswith("_"):
+                table.add_row(field, str(value))
+
+        console = Console()
+        console.print(table)
+
     @classmethod
     def from_reader(cls, r: BinaryReader):
         time = r.read_uint64()
@@ -97,6 +112,18 @@ class StageV6:
     swords_only: bool
     refined_mode: bool
     team_rotate: bool
+
+    def display_table(cls):
+        table = Table(title="Stage Information")
+        table.add_column("Field", style="green", justify="left")
+        table.add_column("Value", style="cyan", justify="left")
+
+        for field, value in cls.__dict__.items():
+            if not field.startswith("_"):
+                table.add_row(field, str(value))
+
+        console = Console()
+        console.print(table)
 
     @classmethod
     def from_reader(cls, r: BinaryReader):
