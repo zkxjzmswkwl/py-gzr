@@ -13,6 +13,16 @@
 - Freestyle (v7, v8, v9)
 - Dark GunZ
 
+### Won't do
+- UGG
+  - Malware
+- GG GunZ
+  - Will but shutdown soon, who cares
+- FXP
+  - Owner has admitted to shipping download-and-execute functionality in the past.
+  - Replay files are filled with garbage data.
+  - Also it's bad.
+
 ### Util
 - `dump.decompress_to_disk(input_gzr: str, output_gzr: str)`
   - Runs zlib decompression and writes decompressed data back to disk.
