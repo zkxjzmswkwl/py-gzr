@@ -103,6 +103,7 @@ class AntileadShotgun:
     damage: int
     piercing_ratio: float
     damage_type: int
+    hit: bool
 
 @dataclass
 class HPAPInfo:

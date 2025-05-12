@@ -52,19 +52,28 @@ def get_shotgun_damage_info(blob: bytes, index: int) -> ShotgunDamageInfo:
     """
     Reads the `index`-th ShotgunDamageInfo from `blob` and returns it.
     """
-    base = mget_blob_array_element_offset(blob, index)
+    try:
+        # unpack in one go: I (uint32), i (int32), f (float32), i (int32), i (int32)
+        target, dam, piercing, dam_type, = struct.unpack_from(
+            '<Iifi', blob, 14
+        )
 
-    # unpack in one go: I (uint32), i (int32), f (float32), i (int32), i (int32)
-    target, dam, piercing, dam_type, = struct.unpack_from(
-        '<Iifi', blob, 14
-    )
-
-    return AntileadShotgun(
-        target=target,
-        damage=dam,
-        piercing_ratio=piercing,
-        damage_type=dam_type,
-    )
+        return AntileadShotgun(
+            target=target,
+            damage=dam,
+            piercing_ratio=piercing,
+            damage_type=dam_type,
+            hit=True
+        )
+    except:
+        # they missed
+        return AntileadShotgun(
+            target=0,
+            damage=0,
+            piercing_ratio=0.0,
+            damage_type=0,
+            hit=False
+        )
 
 def get_peer_node_info(blob: bytes, index: int):
     """

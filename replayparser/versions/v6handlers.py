@@ -1,7 +1,7 @@
 from collections import Counter, defaultdict
 
 from replayparser.core import BinaryReader
-from replayparser.models import Announcement, ChangeWeapon, Dash, Death, GameDead, HPAPInfo, Massive, PeerSPMotion, PeerShotSP, Reload, Round, Skill, Slash, Spawn, Message, WorldItemPickup
+from replayparser.models import Announcement, AntileadShotgun, ChangeWeapon, Dash, Death, GameDead, HPAPInfo, Massive, PeerSPMotion, PeerShotSP, Reload, Round, Skill, Slash, Spawn, Message, WorldItemPickup
 from replayparser.util.mget import get_shotgun_damage_info
 from replayparser.util.basicinfo import unpack_basicinfo
 from replayparser.util.mcommand import MPT, MCommand
@@ -30,11 +30,8 @@ def handle_antilead_shotgun(c):
     time = mcmd.get_parameter(0)
     sel_type = mcmd.get_parameter(1)
     data = mcmd.get_parameter(2)
-
-    if len(data) > 8:
-        shot = get_shotgun_damage_info(data, 0)
-        return shot
-    return None
+    shot = get_shotgun_damage_info(data, 0)
+    return shot
 
 
 def handle_round_state_change(c):

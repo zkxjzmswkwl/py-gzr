@@ -42,12 +42,15 @@ def entry():
             print(f"{current_round}: {str_attacker} killed {str_victim} with {str_weapon}")
         elif pt == AntileadShotgun:
             str_attacker = muid_to_name(sender)
-            # str_target = muid_to_name(packet.target)
-            damage = packet.damage
-            if str_attacker not in damage_by_round[current_round]:
-                damage_by_round[current_round][str_attacker] = 0
-            damage_by_round[current_round][str_attacker] += damage
+            if packet.hit:
+                damage = packet.damage
+                if str_attacker not in damage_by_round[current_round]:
+                    damage_by_round[current_round][str_attacker] = 0
+                damage_by_round[current_round][str_attacker] += damage
+            else:
+                print(f"{current_round}: {str_attacker} missed")
         elif pt == Round:
+            pass
             if MMatchRoundState(packet.state) == MMatchRoundState.MMATCH_ROUNDSTATE_PLAY:
                 print("=" * 50)
                 print(f"Round {packet.round} started")
