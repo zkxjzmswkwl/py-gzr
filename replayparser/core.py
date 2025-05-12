@@ -2,7 +2,8 @@ import zlib
 from typing import Type, Dict
 
 from replayparser.binaryreader import BinaryReader
-from replayparser.versions.v6handlers import handle_announce, handle_antilead_shotgun, handle_basicinfo, handle_change_weapon, handle_chat, handle_dash, handle_die, handle_game_dead, handle_hpap_info, handle_massive, handle_peer_shot_sp, handle_peer_sp_motion, handle_player_join_battle, handle_reload, handle_round_state_change, handle_skill, handle_slash, handle_spawn, handle_worlditem_pickup
+from replayparser.util.dump import hex_dump
+from replayparser.versions.v6handlers import handle_announce, handle_antilead_shotgun, handle_basicinfo, handle_change_weapon, handle_chat, handle_dash, handle_die, handle_game_dead, handle_hpap_info, handle_massive, handle_peer_shot, handle_peer_shot_sp, handle_peer_sp_motion, handle_player_join_battle, handle_reload, handle_round_state_change, handle_skill, handle_slash, handle_spawn, handle_worlditem_pickup
 
 from .models import Replay, Command
 
@@ -146,6 +147,12 @@ def parse_replay(path: str) -> Replay:
         elif opcode == 1512:
             game_dead = handle_game_dead(c)
             unpacked.append((time, c['sender'], opcode, game_dead))
+        elif opcode == 10034:
+            hex_dump(c['buffer'])
+            peer_shot = handle_peer_shot(c)
+            unpacked.append((time, c['sender'], opcode, peer_shot))
+            print(peer_shot)
+
 
     r.packets = unpacked
     return r

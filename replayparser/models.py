@@ -215,3 +215,14 @@ class GameDead:
     weapon_type: MMatchWeaponType
     victim: int
     victim_arg: int
+
+@dataclass
+class PeerShot:
+    time: float
+    pos_x: float
+    pos_y: float
+    pos_z: float
+    to_x: float
+    to_y: float
+    to_z: float
+    sel_type: int

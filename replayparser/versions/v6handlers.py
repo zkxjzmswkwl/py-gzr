@@ -1,7 +1,7 @@
 from collections import Counter, defaultdict
 
 from replayparser.binaryreader import BinaryReader
-from replayparser.models import Announcement, AntileadShotgun, ChangeWeapon, Dash, Death, GameDead, HPAPInfo, Massive, PeerSPMotion, PeerShotSP, Reload, Round, Skill, Slash, Spawn, Message, WorldItemPickup
+from replayparser.models import Announcement, AntileadShotgun, ChangeWeapon, Dash, Death, GameDead, HPAPInfo, Massive, PeerSPMotion, PeerShot, PeerShotSP, Reload, Round, Skill, Slash, Spawn, Message, WorldItemPickup
 from replayparser.util.mget import get_shotgun_damage_info
 from replayparser.util.basicinfo import unpack_basicinfo
 from replayparser.util.mcommand import MPT, MCommand
@@ -22,7 +22,6 @@ def handle_basicinfo(c):
         return result
     return None
 
-
 def handle_antilead_shotgun(c):
     """Opcode: 8022"""
     mcmd = MCommand.from_bytes(c['buffer'], [MPT.FLOAT, MPT.SHORT, MPT.BLOB])
@@ -32,6 +31,18 @@ def handle_antilead_shotgun(c):
     shot = get_shotgun_damage_info(data, 0)
     return shot
 
+def handle_peer_shot(c):
+    """Opcode: 10034"""
+    r = BinaryReader(c['buffer'][9:])
+    time = r.read_float()
+    pos_x = r.read_int16()
+    pos_y = r.read_int16()
+    pos_z = r.read_int16()
+    to_x = r.read_int16()
+    to_y = r.read_int16()
+    to_z = r.read_int16()
+    sel_type = r.read_uint8()
+    return PeerShot(time, pos_x, pos_y, pos_z, to_x, to_y, to_z, sel_type)
 
 def handle_round_state_change(c):
     """Opcode: 1501"""
