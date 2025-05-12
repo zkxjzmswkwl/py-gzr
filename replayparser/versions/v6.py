@@ -8,14 +8,11 @@ from ..binaryreader import BinaryReader
 from rich.console import Console
 from rich.table import Table
 
-MMCIP_END        = 14
-CLAN_NAME_LENGTH = 16
-MAPNAME_LENGTH   = 32
-STAGE_NAME_LENGTH   = 64
-
-SIZE_REPLAY_HEADER_RG = 32
-SIZE_REPLAY_STAGE_SETTING_NODE = 192
-SIZE_REPLAY_PLAYER_INFO = 774
+MMCIP_END                      = 14
+CLAN_NAME_LENGTH               = 16
+MAPNAME_LENGTH                 = 32
+STAGE_NAME_LENGTH              = 64
+SIZE_REPLAY_HEADER_RG          = 32
 
 def get_mmatch_gametype_name(value):
     gametype_map = {
@@ -86,7 +83,6 @@ class HeaderV6:
 
         assert r.buf.tell() == SIZE_REPLAY_HEADER_RG, \
             f"V6 (iGunZ.net): expected {SIZE_REPLAY_HEADER_RG} bytes, got {r.buf.tell()}"
-
         return cls(time=time, major=major, minor=minor, patch=patch, revision=revision)
 
 
