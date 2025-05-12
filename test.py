@@ -1,9 +1,10 @@
 import replayparser as gzr
 from replayparser.models import AntileadShotgun, Message
+from replayparser.util import decompress_to_disk
 
-replay = gzr.parse_replay("assets/shagers/castle0900.gzr")
-replay.header.display_table()
-replay.stage.display_table()
+replay = gzr.parse_replay("assets/igz_ladder.gzr")
+# replay.header.display_table()
+# replay.stage.display_table()
 
 def log_event(time, msg):
     print(f"{time}: {msg}")

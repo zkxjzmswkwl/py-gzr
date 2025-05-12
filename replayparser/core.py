@@ -38,11 +38,13 @@ def parse_replay(path: str) -> Replay:
     if not HeaderCls:
         raise ValueError(f"No header registered for version {version}")
     header = HeaderCls.from_reader(reader)
+    print(header)
 
     StageCls = _STAGE_REGISTRY.get(version)
     if not StageCls:
         raise ValueError(f"No stage registered for version {version}")
     stage = StageCls.from_reader(reader)
+    print(stage)
 
     cnt = reader.read_int32()
     PlayerCls = _PLAYER_REGISTRY[version]
