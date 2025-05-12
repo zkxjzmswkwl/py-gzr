@@ -87,6 +87,6 @@ for c in r.packets:
 
 
 sorted_opcodes = opcode_count.most_common()
-with open("output/opcodes.txt", "w") as f:
+with open("opcodes.txt", "w") as f:
     for opcode, count in sorted_opcodes:
         f.write(f"Opcode {opcode}: {count} packets\n")
