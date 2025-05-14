@@ -1,5 +1,10 @@
 # GZR parsing library
 
+### Port
+When I wake up I'll be porting this project to Go and continuing it there.
+There's a chance I handle the parsing in C and use exported functions, then retool this project to do the same.
+
+
 ### Currently supported replay versions
 - International GunZ (4)
   - Command parsing broke at some point. Low priority atm.
